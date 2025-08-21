@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Price Catalog</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles & Animations -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+
+        /* Animation for product cards appearing */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* A class to apply the animation */
+        .product-card-animate {
+            /* Set initial state for animation */
+            opacity: 0; 
+            /* Apply the animation */
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Custom scrollbar for a more subtle look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; /* bg-slate-100 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* bg-slate-300 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* bg-slate-400 */
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-700">
+
+    <!-- Header Section -->
+    <header class="bg-slate-800 shadow-lg">
+        <div class="container mx-auto px-6 py-6 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
+            <!-- ** LOGO PLACEHOLDER ** -->
+            <!-- Replace the 'src' with the URL of your logo. -->
+            <!-- For example: src="./images/my-logo.png" -->
+            <img src="https://i.ibb.co/7d57gNYf/Clean-Shot-14-08-2025-at-2-11-43-2x.png" alt="Company Logo" class="h-14 w-auto">
+            
+            <div class="text-center sm:text-left">
+                 <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                    Digital Price Catalog
+                </h1>
+                <p class="text-slate-300 mt-1">Browse 600+ Products</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- Brand Navigation Buttons -->
+        <nav id="brand-nav" class="bg-white p-4 shadow-md mb-10 rounded-xl md:sticky top-4 z-10 backdrop-blur-sm bg-white/70">
+            <div id="brand-nav-buttons" class="flex flex-wrap justify-center gap-3">
+                <!-- Brand buttons will be dynamically injected here -->
+                <div class="text-center p-4">Loading Brands...</div>
+            </div>
+        </nav>
+
+        <!-- Product Display Section -->
+        <section id="product-section">
+            <div id="brand-title-container" class="flex items-center mb-8 gap-4">
+                <span class="w-3 h-10 bg-indigo-500 rounded-full"></span>
+                <h2 id="brand-title" class="text-3xl font-bold text-slate-800">
+                    Loading...
+                </h2>
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Product cards will be dynamically injected here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="text-center py-6 mt-12 bg-white border-t border-slate-200">
+        <p class="text-slate-500 text-sm">&copy; 2025 Çomoğlu Gıda Price Catalog. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- Configuration ---
+        const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTemIQAjyMsEqPPUYaNMIn2rwrEbuqR7NrW9vey_mC1iZmIn7FZlOH7g3Co7bZG5B18BJy7Cjldvs53/pub?gid=0&single=true&output=csv';
+
+        // *** CHANGE: Brand to Logo URL Mapping ***
+        // This object maps brand names directly to their logo URLs.
+        const brandLogoMap = {
+            "BEŞLER": "https://res.cloudinary.com/dnc3itu1c/image/upload/l1.jpg",
+            "MASSIMO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l2.jpg",
+            "EDAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l3.jpg",
+            "BENORGANIC": "https://res.cloudinary.com/dnc3itu1c/image/upload/l4.jpg",
+            "UĞURLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l5.jpg",
+            "ÜNALPEYNIR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l6.jpg",
+            "ŞİFALIKÖY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l7.jpg",
+            "HOSANLI": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239661/l8.jpg",
+            "ORDU TARIM": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239712/l9.jpg",
+            "HAŞİROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l10.jpg",
+            "TADA": "https://res.cloudinary.com/dnc3itu1c/image/upload/l11.jpg",
+            "TAT": "https://res.cloudinary.com/dnc3itu1c/image/upload/l12.jpg",
+            "TEK LEZET": "https://res.cloudinary.com/dnc3itu1c/image/upload/l13.jpg",
+            "TAHSİLDAROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l14.jpg",
+            "ERİŞ UN": "https://res.cloudinary.com/dnc3itu1c/image/upload/l15.jpg",
+            "SOSERO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l16.jpg",
+            "YÖRE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l17.jpg",
+            "JUNGLE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l18.jpg",
+            "SMILE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l19.jpg",
+            "AYTAÇ": "https://res.cloudinary.com/dnc3itu1c/image/upload/l20.jpg",
+            "OFÇAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l21.jpg",
+            "EFOR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l22.jpg",
+            "GÜNDOĞDU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l23.jpg" // Note: Skipping to l32 as per your instruction
+        };
+
+        // --- DOM Elements ---
+        const brandNavContainer = document.getElementById('brand-nav-buttons');
+        const brandTitleContainer = document.getElementById('brand-title-container');
+        const productGrid = document.getElementById('product-grid');
+        let catalogData = {};
+        let orderedBrands = [];
+
+        /**
+         * Parses CSV text into a structured JavaScript object.
+         */
+        function parseCsvData(csvText) {
+            const data = {};
+            const seenBrands = new Set();
+            const rows = csvText.trim().split('\n').filter(row => row.trim() !== '');
+            const headers = rows[0].split(',').map(h => h.trim());
+            
+            const brandIndex = headers.indexOf('Brand');
+            const nameIndex = headers.indexOf('Name');
+            const priceIndex = headers.indexOf('Price');
+            const codeIndex = headers.indexOf('ProductCode');
+            const imageIndex = headers.indexOf('ImageURL');
+            const idIndex = headers.indexOf('ID');
+
+            for (let i = 1; i < rows.length; i++) {
+                const rowText = rows[i].trim();
+                if (!rowText.includes(',')) continue;
+                
+                const values = rowText.split(',').map(v => v.trim());
+                const brand = values[brandIndex] ? values[brandIndex].trim() : null;
+
+                if (!brand || brand.toLowerCase() === 'brand') continue;
+
+                if (!data[brand]) {
+                    data[brand] = [];
+                }
+                
+                if (!seenBrands.has(brand)) {
+                    orderedBrands.push(brand);
+                    seenBrands.add(brand);
+                }
+
+                data[brand].push({
+                    id: values[idIndex] || `prod-${Date.now()}-${i}`,
+                    productCode: values[codeIndex] || 'N/A',
+                    name: values[nameIndex] || 'Unnamed Product',
+                    price: parseFloat(values[priceIndex]) || 0,
+                    imageUrl: values[imageIndex] || null
+                });
+            }
+            return data;
+        }
+        
+        /**
+         * Renders the product grid for a selected brand.
+         */
+        function displayProducts(brand) {
+            if (!catalogData[brand] || catalogData[brand].length === 0) {
+                console.warn(`Brand "${brand}" not found or has no products.`);
+                productGrid.innerHTML = `<p class="text-center col-span-full">No products found for this brand.</p>`;
+                return;
+            }
+            
+            // *** CHANGE: Get logo URL from the new map ***
+            const brandLogoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo"; // Fallback logo
+
+            brandTitleContainer.innerHTML = `
+                <span class="w-3 h-10 bg-indigo-500 rounded-full"></span>
+                <img src="${brandLogoUrl}" alt="${brand} Logo" class="h-10 w-auto object-contain">
+                <h2 class="text-3xl font-bold text-slate-800">${brand}</h2>
+            `;
+            
+            productGrid.innerHTML = '';
+
+            document.querySelectorAll('#brand-nav-buttons button').forEach(button => {
+                const isActive = button.dataset.brand === brand;
+                button.className = `px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 ${
+                    isActive
+                        ? 'bg-indigo-600 text-white shadow-lg'
+                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                }`;
+            });
+
+            const products = catalogData[brand] || [];
+            let gridHTML = '';
+            products.forEach((product, index) => {
+                const placeholderUrl = `https://placehold.co/400x400/EEE/31343C?text=${encodeURIComponent(product.name.split(' ')[0])}`;
+                const imageUrl = product.imageUrl || placeholderUrl;
+
+                gridHTML += `
+                    <div class="product-card-animate bg-white rounded-2xl shadow-lg overflow-hidden group transition-shadow duration-300 hover:shadow-xl flex flex-col" style="animation-delay: ${index * 50}ms;">
+                        <div class="relative h-56">
+                            <img 
+                                src="${imageUrl}" 
+                                alt="${product.name}" 
+                                class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
+                                loading="lazy"
+                                onError="this.onerror=null; this.src='${placeholderUrl}';"
+                            />
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex-grow mb-4">
+                                <h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3>
+                            </div>
+                            <div class="flex justify-between items-center mt-auto">
+                                <p class="text-2xl font-extrabold text-slate-900">
+                                    ${product.price.toFixed(2)}
+                                    <span class="text-base font-medium text-slate-500">TL</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            productGrid.innerHTML = gridHTML;
+        }
+
+        /**
+         * Initializes the application.
+         */
+        async function initializeApp() {
+            try {
+                const response = await fetch(googleSheetCsvUrl);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok (status: ${response.status}). Check if the sheet is published correctly.`);
+                }
+                const csvText = await response.text();
+                catalogData = parseCsvData(csvText);
+                
+                brandNavContainer.innerHTML = '';
+                if (orderedBrands.length > 0) {
+                    orderedBrands.forEach(brand => {
+                        const button = document.createElement('button');
+                        button.dataset.brand = brand;
+                        button.className = 'px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center gap-2';
+                        
+                        // *** CHANGE: Get logo URL from the new map ***
+                        const logoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo"; // Fallback logo
+
+                        button.innerHTML = `
+                            <img src="${logoUrl}" alt="${brand} Logo" class="h-6 w-6 object-contain rounded-full bg-white p-0.5">
+                            <span>${brand}</span>
+                        `;
+
+                        button.onclick = () => {
+                            displayProducts(brand);
+                        };
+                        brandNavContainer.appendChild(button);
+                    });
+                    displayProducts(orderedBrands[0]);
+                } else {
+                    brandTitleContainer.innerHTML = `<h2 class="text-3xl font-bold text-slate-800">No products found.</h2>`;
+                    productGrid.innerHTML = `<p class="text-center col-span-full text-slate-500">The catalog is currently empty. Please add products to the Google Sheet.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                brandTitleContainer.innerHTML = `<h2 class="text-3xl font-bold text-red-600">Error Loading Products</h2>`;
+                productGrid.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 col-span-full rounded-r-lg" role="alert">
+                                            <p class="font-bold">Failed to load data</p>
+                                            <p>${error.message}</p>
+                                         </div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

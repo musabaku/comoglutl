@@ -137,6 +137,10 @@
                         <span>Total:</span>
                         <span id="cart-total">0.00 TL</span>
                     </div>
+                    <div class="mb-4">
+                        <label for="company-name" class="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+                        <input type="text" id="company-name" name="company-name" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your company name" required>
+                    </div>
                     <div class="flex gap-2">
                         <button id="export-pdf" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition disabled:opacity-50" disabled>Export PDF</button>
                         <button id="export-excel" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition disabled:opacity-50" disabled>Export Excel</button>
@@ -205,6 +209,7 @@
         const exportPdfBtn = document.getElementById('export-pdf');
         const exportExcelBtn = document.getElementById('export-excel');
         const toastEl = document.getElementById('toast');
+        const companyNameInput = document.getElementById('company-name');
 
         let catalogData = {};
         let orderedBrands = [];
@@ -258,12 +263,8 @@
                         console.log("No user found, attempting anonymous sign-in...");
                         try {
                             await signInAnonymously(auth);
-                            // If successful, this onAuthStateChanged listener will be triggered again 
-                            // with the new user object, and the code inside the `if (user)` block will run.
                         } catch (signInError) {
                             console.error("Firebase anonymous sign-in failed:", signInError);
-                            // This is where the 'auth/configuration-not-found' error will be caught if it persists.
-                            // This indicates a configuration issue in the Firebase console (e.g., Anonymous sign-in is not enabled).
                         }
                     }
                 });
@@ -419,7 +420,7 @@
                         <div class="flex justify-between items-center mt-auto">
                             <p class="text-2xl font-extrabold text-slate-900">
                                 ${product.price.toFixed(2)}
-                                <span class="text-base font-medium text-slate-500">TL / adet</span>
+                                <span class="text-base font-medium text-slate-500">TL / piece</span>
                             </p>
                             <div class="quantity-control-container">
                                 ${quantityControlsHTML}
@@ -500,13 +501,23 @@
         }
 
         /**
+         * Checks if export buttons should be enabled or disabled.
+         */
+        function updateExportButtonState() {
+            const companyName = companyNameInput.value.trim();
+            const isCartEmpty = Object.keys(cart).length === 0;
+            const canExport = !isCartEmpty && companyName !== '';
+
+            exportPdfBtn.disabled = !canExport;
+            exportExcelBtn.disabled = !canExport;
+        }
+
+        /**
          * Renders the cart UI based on the local cart state.
          */
         function renderCart() {
             if (Object.keys(cart).length === 0) {
                 cartItemsContainer.innerHTML = `<p class="text-slate-500 text-center mt-8">Your cart is empty.</p>`;
-                exportPdfBtn.disabled = true;
-                exportExcelBtn.disabled = true;
             } else {
                 cartItemsContainer.innerHTML = '';
                 Object.entries(cart).forEach(([id, item]) => {
@@ -524,8 +535,6 @@
                     `;
                     cartItemsContainer.appendChild(itemEl);
                 });
-                exportPdfBtn.disabled = false;
-                exportExcelBtn.disabled = false;
             }
 
             // Add event listeners for quantity changes and removal
@@ -540,6 +549,7 @@
             });
 
             updateCartSummary();
+            updateExportButtonState();
         }
 
         /**
@@ -575,6 +585,7 @@
          * Exports the cart to a PDF file.
          */
         function handleExportPdf() {
+            const companyName = companyNameInput.value.trim();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -582,7 +593,8 @@
             doc.text("Order Summary", 14, 22);
             doc.setFontSize(11);
             doc.setTextColor(100);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+            doc.text(`Company: ${companyName}`, 14, 30);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 38);
 
             const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
             const data = Object.values(cart).map(item => [
@@ -593,7 +605,7 @@
             ]);
 
             doc.autoTable({
-                startY: 40,
+                startY: 50,
                 head: headers,
                 body: data,
                 theme: 'striped',
@@ -605,14 +617,17 @@
             doc.setFontSize(14);
             doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
 
-            doc.save("cart_summary.pdf");
+            doc.save(`order_${companyName.replace(/\s+/g, '_')}.pdf`);
         }
 
         /**
          * Exports the cart to an Excel (XLSX) file.
          */
         function handleExportExcel() {
+            const companyName = companyNameInput.value.trim();
             const worksheetData = [
+                ["Company Name:", companyName],
+                [], // Spacer row
                 ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]
             ];
             
@@ -634,7 +649,7 @@
             const ws = XLSX.utils.aoa_to_sheet(worksheetData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Cart");
-            XLSX.writeFile(wb, "cart_summary.xlsx");
+            XLSX.writeFile(wb, `order_${companyName.replace(/\s+/g, '_')}.xlsx`);
         }
 
         /**
@@ -690,6 +705,7 @@
         closeCartButton.addEventListener('click', toggleCart);
         exportPdfBtn.addEventListener('click', handleExportPdf);
         exportExcelBtn.addEventListener('click', handleExportExcel);
+        companyNameInput.addEventListener('input', updateExportButtonState);
         document.addEventListener('DOMContentLoaded', initCatalogApp);
 
     </script>

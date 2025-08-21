@@ -13,6 +13,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- jsPDF and jsPDF-AutoTable for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    
+    <!-- SheetJS (xlsx) for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <!-- Custom Styles & Animations -->
     <style>
         body {
@@ -32,15 +40,12 @@
             }
         }
 
-        /* A class to apply the animation */
         .product-card-animate {
-            /* Set initial state for animation */
             opacity: 0; 
-            /* Apply the animation */
             animation: fadeIn 0.5s ease-out forwards;
         }
 
-        /* Custom scrollbar for a more subtle look */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -54,50 +59,91 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; /* bg-slate-400 */
         }
+
+        /* Cart styles */
+        #cart-container {
+            transition: transform 0.3s ease-in-out;
+        }
+        .cart-hidden {
+            transform: translateX(100%);
+        }
     </style>
 </head>
 <body class="antialiased text-slate-700">
 
     <!-- Header Section -->
-    <header class="bg-slate-800 shadow-lg">
-        <div class="container mx-auto px-6 py-6 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
-            <!-- ** LOGO PLACEHOLDER ** -->
-            <!-- Replace the 'src' with the URL of your logo. -->
-            <!-- For example: src="./images/my-logo.png" -->
-            <img src="https://i.ibb.co/7d57gNYf/Clean-Shot-14-08-2025-at-2-11-43-2x.png" alt="Company Logo" class="h-14 w-auto">
-            
-            <div class="text-center sm:text-left">
-                 <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                    Digital Price Catalog
-                </h1>
-                <p class="text-slate-300 mt-1">Browse 600+ Products</p>
+    <header class="bg-slate-800 shadow-lg sticky top-0 z-20">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <img src="https://i.ibb.co/7d57gNYf/Clean_Shot-14-08-2025-at-2-11-43-2x.png" alt="Company Logo" class="h-12 w-auto">
+                <div class="text-left">
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                        Digital Price Catalog
+                    </h1>
+                    <p class="text-slate-300 mt-1 text-sm">Browse 600+ Products</p>
+                </div>
             </div>
+            <button id="view-cart-button" class="relative bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto p-4 md:p-8">
-        
-        <!-- Brand Navigation Buttons -->
-        <nav id="brand-nav" class="bg-white p-4 shadow-md mb-10 rounded-xl md:sticky top-4 z-10 backdrop-blur-sm bg-white/70">
-            <div id="brand-nav-buttons" class="flex flex-wrap justify-center gap-3">
-                <!-- Brand buttons will be dynamically injected here -->
-                <div class="text-center p-4">Loading Brands...</div>
-            </div>
-        </nav>
+    <main class="container mx-auto p-4 md:p-8 relative">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Products Section -->
+            <div class="w-full">
+                <!-- Brand Navigation Buttons -->
+                <nav id="brand-nav" class="bg-white p-4 shadow-md mb-10 rounded-xl md:sticky top-24 z-10 backdrop-blur-sm bg-white/70">
+                    <div id="brand-nav-buttons" class="flex flex-wrap justify-center gap-3">
+                        <div class="text-center p-4">Loading Brands...</div>
+                    </div>
+                </nav>
 
-        <!-- Product Display Section -->
-        <section id="product-section">
-            <div id="brand-title-container" class="flex items-center mb-8 gap-4">
-                <span class="w-3 h-10 bg-indigo-500 rounded-full"></span>
-                <h2 id="brand-title" class="text-3xl font-bold text-slate-800">
-                    Loading...
-                </h2>
+                <!-- Product Display Section -->
+                <section id="product-section">
+                    <div id="brand-title-container" class="flex items-center mb-8 gap-4">
+                        <span class="w-3 h-10 bg-indigo-500 rounded-full"></span>
+                        <h2 id="brand-title" class="text-3xl font-bold text-slate-800">
+                            Loading...
+                        </h2>
+                    </div>
+                    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <!-- Product cards will be dynamically injected here -->
+                    </div>
+                </section>
             </div>
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <!-- Product cards will be dynamically injected here -->
-            </div>
-        </section>
+
+            <!-- Shopping Cart Section -->
+            <aside id="cart-container" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 p-6 flex flex-col cart-hidden">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-slate-800">My Cart</h2>
+                    <button id="close-cart-button" class="text-slate-500 hover:text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="cart-items" class="flex-grow overflow-y-auto">
+                    <!-- Cart items will be injected here -->
+                    <p class="text-slate-500 text-center mt-8">Your cart is empty.</p>
+                </div>
+                <div class="border-t pt-4 mt-4">
+                    <div class="flex justify-between items-center font-bold text-lg mb-4">
+                        <span>Total:</span>
+                        <span id="cart-total">0.00 TL</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="export-pdf" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition disabled:opacity-50" disabled>Export PDF</button>
+                        <button id="export-excel" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition disabled:opacity-50" disabled>Export Excel</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
     </main>
 
     <!-- Footer Section -->
@@ -105,12 +151,21 @@
         <p class="text-slate-500 text-sm">&copy; 2025 Çomoğlu Gıda Price Catalog. All rights reserved.</p>
     </footer>
 
-    <script>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white py-2 px-5 rounded-lg shadow-lg opacity-0 translate-y-3 transition-all duration-300">
+        Item added to cart!
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // --- Configuration ---
         const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTemIQAjyMsEqPPUYaNMIn2rwrEbuqR7NrW9vey_mC1iZmIn7FZlOH7g3Co7bZG5B18BJy7Cjldvs53/pub?gid=0&single=true&output=csv';
 
-        // *** CHANGE: Brand to Logo URL Mapping ***
-        // This object maps brand names directly to their logo URLs.
         const brandLogoMap = {
             "BEŞLER": "https://res.cloudinary.com/dnc3itu1c/image/upload/l1.jpg",
             "MASSIMO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l2.jpg",
@@ -134,16 +189,107 @@
             "AYTAÇ": "https://res.cloudinary.com/dnc3itu1c/image/upload/l20.jpg",
             "OFÇAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l21.jpg",
             "EFOR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l22.jpg",
-            "GÜNDOĞDU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l23.jpg" // Note: Skipping to l32 as per your instruction
+            "GÜNDOĞDU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l23.jpg"
         };
 
         // --- DOM Elements ---
         const brandNavContainer = document.getElementById('brand-nav-buttons');
         const brandTitleContainer = document.getElementById('brand-title-container');
         const productGrid = document.getElementById('product-grid');
+        const cartContainer = document.getElementById('cart-container');
+        const viewCartButton = document.getElementById('view-cart-button');
+        const closeCartButton = document.getElementById('close-cart-button');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const cartItemCountEl = document.getElementById('cart-item-count');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const exportExcelBtn = document.getElementById('export-excel');
+        const toastEl = document.getElementById('toast');
+
         let catalogData = {};
         let orderedBrands = [];
+        let cart = {}; // Local cart state
+        let currentBrand = null; // To track the currently displayed brand
+        
+        // --- Firebase ---
+        let db, auth, userId;
+        let cartDocRef;
+        let unsubscribeCart; // To detach listener on sign-out
 
+        // Use provided Firebase config and App ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        /**
+         * Initializes Firebase and sets up authentication.
+         */
+        async function initializeFirebase() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is not available.");
+                return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('debug');
+
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        console.log("User is signed in:", user.uid);
+                        userId = user.uid;
+                        const cartPath = `/artifacts/${appId}/users/${userId}/cart/data`;
+                        cartDocRef = doc(db, cartPath);
+                        listenToCartChanges();
+                    } else {
+                        console.log("User is signed out.");
+                        if (unsubscribeCart) unsubscribeCart();
+                        userId = null;
+                        cart = {};
+                        renderCart();
+                    }
+                });
+
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+            }
+        }
+        
+        /**
+         * Listens for real-time updates to the user's cart in Firestore.
+         */
+        function listenToCartChanges() {
+            if (unsubscribeCart) unsubscribeCart();
+            if (!cartDocRef) return;
+
+            unsubscribeCart = onSnapshot(cartDocRef, (doc) => {
+                cart = doc.exists() ? doc.data().items || {} : {};
+                renderCart();
+                // Refresh the product grid if a brand is currently displayed
+                if (currentBrand) {
+                    displayProducts(currentBrand);
+                }
+            }, (error) => {
+                console.error("Error listening to cart changes:", error);
+            });
+        }
+
+        /**
+         * Saves the entire cart object to Firestore.
+         */
+        async function saveCartToFirestore() {
+            if (!cartDocRef) return;
+            try {
+                await setDoc(cartDocRef, { items: cart });
+            } catch (error) {
+                console.error("Error saving cart to Firestore:", error);
+            }
+        }
+        
         /**
          * Parses CSV text into a structured JavaScript object.
          */
@@ -193,14 +339,14 @@
          * Renders the product grid for a selected brand.
          */
         function displayProducts(brand) {
+            currentBrand = brand; // Set the current brand
             if (!catalogData[brand] || catalogData[brand].length === 0) {
                 console.warn(`Brand "${brand}" not found or has no products.`);
                 productGrid.innerHTML = `<p class="text-center col-span-full">No products found for this brand.</p>`;
                 return;
             }
             
-            // *** CHANGE: Get logo URL from the new map ***
-            const brandLogoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo"; // Fallback logo
+            const brandLogoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo";
 
             brandTitleContainer.innerHTML = `
                 <span class="w-3 h-10 bg-indigo-500 rounded-full"></span>
@@ -220,43 +366,268 @@
             });
 
             const products = catalogData[brand] || [];
-            let gridHTML = '';
             products.forEach((product, index) => {
+                const card = document.createElement('div');
+                card.className = "product-card-animate bg-white rounded-2xl shadow-lg overflow-hidden group transition-shadow duration-300 hover:shadow-xl flex flex-col";
+                card.style.animationDelay = `${index * 50}ms`;
+
                 const placeholderUrl = `https://placehold.co/400x400/EEE/31343C?text=${encodeURIComponent(product.name.split(' ')[0])}`;
                 const imageUrl = product.imageUrl || placeholderUrl;
+                const quantity = cart[product.id]?.quantity || 0;
 
-                gridHTML += `
-                    <div class="product-card-animate bg-white rounded-2xl shadow-lg overflow-hidden group transition-shadow duration-300 hover:shadow-xl flex flex-col" style="animation-delay: ${index * 50}ms;">
-                        <div class="relative h-56">
-                            <img 
-                                src="${imageUrl}" 
-                                alt="${product.name}" 
-                                class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
-                                loading="lazy"
-                                onError="this.onerror=null; this.src='${placeholderUrl}';"
-                            />
+                let quantityControlsHTML;
+                if (quantity === 0) {
+                    quantityControlsHTML = `<button data-product-id="${product.id}" class="add-to-cart-btn w-full bg-indigo-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-indigo-600 transition-all">Add to Cart</button>`;
+                } else {
+                    quantityControlsHTML = `
+                        <div class="flex items-center justify-center gap-2">
+                            <button data-product-id="${product.id}" class="decrement-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">-</button>
+                            <span class="font-bold text-lg w-10 text-center">${quantity}</span>
+                            <button data-product-id="${product.id}" class="increment-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">+</button>
                         </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <div class="flex-grow mb-4">
-                                <h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3>
-                            </div>
-                            <div class="flex justify-between items-center mt-auto">
-                                <p class="text-2xl font-extrabold text-slate-900">
-                                    ${product.price.toFixed(2)}
-                                    <span class="text-base font-medium text-slate-500">TL</span>
-                                </p>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="relative h-56">
+                        <img 
+                            src="${imageUrl}" 
+                            alt="${product.name}" 
+                            class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
+                            loading="lazy"
+                            onError="this.onerror=null; this.src='${placeholderUrl}';"
+                        />
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex-grow mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3>
+                        </div>
+                        <div class="flex justify-between items-center mt-auto">
+                            <p class="text-2xl font-extrabold text-slate-900">
+                                ${product.price.toFixed(2)}
+                                <span class="text-base font-medium text-slate-500">TL</span>
+                            </p>
+                            <div class="quantity-control-container">
+                                ${quantityControlsHTML}
                             </div>
                         </div>
                     </div>
                 `;
+                productGrid.appendChild(card);
             });
-            productGrid.innerHTML = gridHTML;
+
+            // Add event listeners to the new buttons
+            productGrid.querySelectorAll('.add-to-cart-btn, .increment-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const product = findProductById(btn.dataset.productId);
+                    if (product) addToCart(product);
+                };
+            });
+            productGrid.querySelectorAll('.decrement-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const product = findProductById(btn.dataset.productId);
+                    if (product) decrementFromCart(product);
+                };
+            });
+        }
+        
+        /**
+         * Finds a product in the catalogData by its ID.
+         */
+        function findProductById(productId) {
+            for (const brand in catalogData) {
+                const product = catalogData[brand].find(p => p.id === productId);
+                if (product) return product;
+            }
+            return null;
+        }
+
+        /**
+         * Adds a product to the cart or increments its quantity.
+         */
+        function addToCart(product) {
+            const { id, name, price } = product;
+            if (cart[id]) {
+                cart[id].quantity++;
+            } else {
+                cart[id] = { name, price, quantity: 1 };
+                showToast();
+            }
+            saveCartToFirestore();
+        }
+        
+        /**
+         * Decrements a product's quantity or removes it from the cart.
+         */
+        function decrementFromCart(product) {
+            const { id } = product;
+            if (cart[id]) {
+                if (cart[id].quantity > 1) {
+                    cart[id].quantity--;
+                } else {
+                    delete cart[id];
+                }
+                saveCartToFirestore();
+            }
+        }
+
+        /**
+         * Updates item quantity in the cart from the cart sidebar.
+         */
+        function updateCartQuantity(productId, newQuantity) {
+            if (cart[productId]) {
+                if (newQuantity > 0) {
+                    cart[productId].quantity = newQuantity;
+                } else {
+                    delete cart[productId];
+                }
+                saveCartToFirestore();
+            }
+        }
+
+        /**
+         * Renders the cart UI based on the local cart state.
+         */
+        function renderCart() {
+            if (Object.keys(cart).length === 0) {
+                cartItemsContainer.innerHTML = `<p class="text-slate-500 text-center mt-8">Your cart is empty.</p>`;
+                exportPdfBtn.disabled = true;
+                exportExcelBtn.disabled = true;
+            } else {
+                cartItemsContainer.innerHTML = '';
+                Object.entries(cart).forEach(([id, item]) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'flex justify-between items-center mb-4';
+                    itemEl.innerHTML = `
+                        <div class="flex-grow">
+                            <p class="font-semibold">${item.name}</p>
+                            <p class="text-sm text-slate-500">${item.price.toFixed(2)} TL</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" min="1" value="${item.quantity}" data-id="${id}" class="quantity-input w-16 border rounded-md p-1 text-center">
+                            <button data-id="${id}" class="remove-item-btn text-red-500 hover:text-red-700 text-2xl">&times;</button>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(itemEl);
+                });
+                exportPdfBtn.disabled = false;
+                exportExcelBtn.disabled = false;
+            }
+
+            // Add event listeners for quantity changes and removal
+            cartItemsContainer.querySelectorAll('.quantity-input').forEach(input => {
+                input.onchange = (e) => {
+                    const newQuantity = parseInt(e.target.value, 10);
+                    updateCartQuantity(e.target.dataset.id, newQuantity);
+                };
+            });
+            cartItemsContainer.querySelectorAll('.remove-item-btn').forEach(btn => {
+                btn.onclick = (e) => updateCartQuantity(e.target.dataset.id, 0);
+            });
+
+            updateCartSummary();
+        }
+
+        /**
+         * Updates the cart total and item count bubble.
+         */
+        function updateCartSummary() {
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            
+            cartTotalEl.textContent = `${total.toFixed(2)} TL`;
+            cartItemCountEl.textContent = itemCount;
+            cartItemCountEl.classList.toggle('hidden', itemCount === 0);
+        }
+
+        /**
+         * Shows a short-lived toast notification.
+         */
+        function showToast() {
+            toastEl.classList.remove('opacity-0', 'translate-y-3');
+            setTimeout(() => {
+                toastEl.classList.add('opacity-0', 'translate-y-3');
+            }, 2000);
+        }
+        
+        /**
+         * Toggles the visibility of the cart sidebar.
+         */
+        function toggleCart() {
+            cartContainer.classList.toggle('cart-hidden');
+        }
+
+        /**
+         * Exports the cart to a PDF file.
+         */
+        function handleExportPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text("Order Summary", 14, 22);
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+
+            const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
+            const data = Object.values(cart).map(item => [
+                item.name,
+                item.quantity,
+                item.price.toFixed(2),
+                (item.price * item.quantity).toFixed(2)
+            ]);
+
+            doc.autoTable({
+                startY: 40,
+                head: headers,
+                body: data,
+                theme: 'striped',
+                headStyles: { fillColor: [41, 128, 185] }
+            });
+
+            const finalY = doc.autoTable.previous.finalY;
+            const total = Object.values(cart).reduce((sum, item) => sum + item.price * item.quantity, 0);
+            doc.setFontSize(14);
+            doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
+
+            doc.save("cart_summary.pdf");
+        }
+
+        /**
+         * Exports the cart to an Excel (XLSX) file.
+         */
+        function handleExportExcel() {
+            const worksheetData = [
+                ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]
+            ];
+            
+            let total = 0;
+            Object.values(cart).forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                worksheetData.push([
+                    item.name,
+                    item.quantity,
+                    item.price,
+                    itemTotal
+                ]);
+            });
+            
+            worksheetData.push([]); // Spacer row
+            worksheetData.push(["", "", "Grand Total:", total]);
+
+            const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Cart");
+            XLSX.writeFile(wb, "cart_summary.xlsx");
         }
 
         /**
          * Initializes the application.
          */
-        async function initializeApp() {
+        async function initCatalogApp() {
+            await initializeFirebase();
             try {
                 const response = await fetch(googleSheetCsvUrl);
                 if (!response.ok) {
@@ -272,8 +643,7 @@
                         button.dataset.brand = brand;
                         button.className = 'px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center gap-2';
                         
-                        // *** CHANGE: Get logo URL from the new map ***
-                        const logoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo"; // Fallback logo
+                        const logoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo";
 
                         button.innerHTML = `
                             <img src="${logoUrl}" alt="${brand} Logo" class="h-6 w-6 object-contain rounded-full bg-white p-0.5">
@@ -300,8 +670,14 @@
                                          </div>`;
             }
         }
+        
+        // --- Event Listeners ---
+        viewCartButton.addEventListener('click', toggleCart);
+        closeCartButton.addEventListener('click', toggleCart);
+        exportPdfBtn.addEventListener('click', handleExportPdf);
+        exportExcelBtn.addEventListener('click', handleExportExcel);
+        document.addEventListener('DOMContentLoaded', initCatalogApp);
 
-        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
 </html>

@@ -437,7 +437,46 @@
                     `;
                 }
 
-                // **NEW VISUAL DESIGN FOR THE CARD**
+                // **NEW CONDITIONAL LAYOUT LOGIC**
+                let pricingAndControlsHTML;
+                if (product.koliFiyat > 0 && product.koliIciAdet > 0) {
+                    // Layout WITH Koli Fiyat
+                    pricingAndControlsHTML = `
+                        <div class="space-y-4">
+                            <!-- Pricing Block -->
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL</p>
+                                    <p class="text-sm text-slate-500">/ piece</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-extrabold text-indigo-600">${product.koliFiyat.toFixed(2)} TL</p>
+                                    <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet} pcs)</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div class="quantity-control-container">
+                                ${quantityControlsHTML}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Layout WITHOUT Koli Fiyat
+                    pricingAndControlsHTML = `
+                        <div class="flex justify-between items-center">
+                            <p class="text-xl font-extrabold text-slate-900">
+                                ${product.price.toFixed(2)} TL 
+                                <span class="text-sm text-slate-500 font-medium align-baseline">/ piece</span>
+                            </p>
+                            <div class="quantity-control-container w-28">
+                                 ${quantityControlsHTML}
+                            </div>
+                        </div>
+                    `;
+                }
+
+
                 card.innerHTML = `
                     <div class="relative h-56">
                         <img 
@@ -453,25 +492,8 @@
                             <h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3>
                         </div>
                         
-                        <div class="mt-4 pt-4 border-t space-y-4">
-                            <!-- Pricing Block -->
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL</p>
-                                    <p class="text-sm text-slate-500">/ piece</p>
-                                </div>
-                                ${product.koliFiyat > 0 ? `
-                                <div class="text-right">
-                                    <p class="text-xl font-extrabold text-indigo-600">${product.koliFiyat.toFixed(2)} TL</p>
-                                    <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet} pcs)</p>
-                                </div>
-                                ` : ''}
-                            </div>
-                            
-                            <!-- Controls -->
-                            <div class="quantity-control-container">
-                                ${quantityControlsHTML}
-                            </div>
+                        <div class="mt-4 pt-4 border-t">
+                           ${pricingAndControlsHTML}
                         </div>
                     </div>
                 `;
@@ -506,13 +528,14 @@
 
         /**
          * Adds a product to the cart or increments its quantity.
+         * Stores both piece price and koli fiyat to be used later.
          */
         function addToCart(product) {
-            const { id, name, price } = product;
+            const { id, name, price, koliFiyat } = product;
             if (cart[id]) {
                 cart[id].quantity++;
             } else {
-                cart[id] = { name, price, quantity: 1 };
+                cart[id] = { name, price, koliFiyat, quantity: 1 };
                 showToast();
             }
             saveCartToFirestore();
@@ -561,6 +584,7 @@
 
         /**
          * Renders the cart UI based on the local cart state.
+         * Displays Koli Fiyat if available, otherwise piece price.
          */
         function renderCart() {
             if (Object.keys(cart).length === 0) {
@@ -570,10 +594,13 @@
                 Object.entries(cart).forEach(([id, item]) => {
                     const itemEl = document.createElement('div');
                     itemEl.className = 'flex justify-between items-center mb-4';
+
+                    const priceToShow = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                    
                     itemEl.innerHTML = `
                         <div class="flex-grow">
                             <p class="font-semibold">${item.name}</p>
-                            <p class="text-sm text-slate-500">${item.price.toFixed(2)} TL</p>
+                            <p class="text-sm text-slate-500">${priceToShow.toFixed(2)} TL</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <input type="number" min="1" value="${item.quantity}" data-id="${id}" class="quantity-input w-16 border rounded-md p-1 text-center">
@@ -601,9 +628,13 @@
 
         /**
          * Updates the cart total and item count bubble.
+         * Calculates total based on Koli Fiyat if available.
          */
         function updateCartSummary() {
-            const total = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = Object.values(cart).reduce((sum, item) => {
+                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                return sum + (priceToUse * item.quantity);
+            }, 0);
             const itemCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
             
             cartTotalEl.textContent = `${total.toFixed(2)} TL`;
@@ -644,12 +675,15 @@
             doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 38);
 
             const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
-            const data = Object.values(cart).map(item => [
-                item.name,
-                item.quantity,
-                item.price.toFixed(2),
-                (item.price * item.quantity).toFixed(2)
-            ]);
+            const data = Object.values(cart).map(item => {
+                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                return [
+                    item.name,
+                    item.quantity,
+                    priceToUse.toFixed(2),
+                    (priceToUse * item.quantity).toFixed(2)
+                ]
+            });
 
             doc.autoTable({
                 startY: 50,
@@ -660,7 +694,10 @@
             });
 
             const finalY = doc.autoTable.previous.finalY;
-            const total = Object.values(cart).reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const total = Object.values(cart).reduce((sum, item) => {
+                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                return sum + (priceToUse * item.quantity);
+            }, 0);
             doc.setFontSize(14);
             doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
 
@@ -680,12 +717,13 @@
             
             let total = 0;
             Object.values(cart).forEach(item => {
-                const itemTotal = item.price * item.quantity;
+                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                const itemTotal = priceToUse * item.quantity;
                 total += itemTotal;
                 worksheetData.push([
                     item.name,
                     item.quantity,
-                    item.price,
+                    priceToUse,
                     itemTotal
                 ]);
             });

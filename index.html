@@ -321,8 +321,6 @@
             
             const headers = rows[0].replace(/\uFEFF/g, '').split(',').map(h => h.trim().replace(/^"|"$/g, ''));
             
-            console.log("DEBUG: Headers found in CSV ->", headers);
-
             const lowerCaseHeaders = headers.map(h => h.toLowerCase());
 
             const brandIndex = lowerCaseHeaders.indexOf('brand');
@@ -333,16 +331,6 @@
             const idIndex = lowerCaseHeaders.indexOf('id');
             const koliIciAdetIndex = lowerCaseHeaders.findIndex(h => h.includes('koli ici fiyat') || h.includes('koli i̇çi̇ adet') || h.includes('pieces per case'));
             const koliFiyatIndex = lowerCaseHeaders.indexOf('koli fiyat');
-            
-            console.log(`DEBUG: Index for 'Pieces per Case' column is ${koliIciAdetIndex}`);
-            console.log(`DEBUG: Index for 'Koli Fiyat' is ${koliFiyatIndex}`);
-
-            if (koliIciAdetIndex === -1) {
-                console.error("FATAL ERROR: Could not find a header for pieces per case. Looked for 'Koli Ici Fiyat', 'KOLİ İÇİ ADET', and 'Pieces Per Case'.");
-            }
-             if (koliFiyatIndex === -1) {
-                console.error("FATAL ERROR: Could not find 'Koli Fiyat' header.");
-            }
 
             for (let i = 1; i < rows.length; i++) {
                 const rowText = rows[i].trim();
@@ -416,6 +404,12 @@
 
             const products = catalogData[brand] || [];
             products.forEach((product, index) => {
+                // *** DEBUGGING LOG ***
+                console.log(`Rendering product: ${product.name}`, { 
+                    koliFiyat: product.koliFiyat, 
+                    koliIciAdet: product.koliIciAdet 
+                });
+
                 const card = document.createElement('div');
                 card.className = "product-card-animate bg-white rounded-2xl shadow-lg overflow-hidden group transition-shadow duration-300 hover:shadow-xl flex flex-col";
                 card.style.animationDelay = `${index * 50}ms`;
@@ -439,7 +433,7 @@
 
                 // **UPDATED CONDITIONAL LAYOUT LOGIC**
                 let pricingAndControlsHTML;
-                if (product.koliFiyat > 0 && product.koliIciAdet > 0) {
+                if (product.koliFiyat > 0) {
                     // Layout WITH Koli Fiyat
                     pricingAndControlsHTML = `
                         <div class="space-y-4">
@@ -451,7 +445,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-xl font-extrabold text-indigo-600">${product.koliFiyat.toFixed(2)} TL</p>
-                                    <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet} pcs)</p>
+                                    <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet > 0 ? product.koliIciAdet + ' pcs' : ''})</p>
                                 </div>
                             </div>
                             

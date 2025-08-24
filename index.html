@@ -437,7 +437,7 @@
                     `;
                 }
 
-                // **NEW CONDITIONAL LAYOUT LOGIC**
+                // **UPDATED CONDITIONAL LAYOUT LOGIC**
                 let pricingAndControlsHTML;
                 if (product.koliFiyat > 0 && product.koliIciAdet > 0) {
                     // Layout WITH Koli Fiyat
@@ -464,12 +464,12 @@
                 } else {
                     // Layout WITHOUT Koli Fiyat
                     pricingAndControlsHTML = `
-                        <div class="flex justify-between items-center">
-                            <p class="text-xl font-extrabold text-slate-900">
+                        <div class="space-y-4">
+                             <p class="text-xl font-extrabold text-slate-900">
                                 ${product.price.toFixed(2)} TL 
                                 <span class="text-sm text-slate-500 font-medium align-baseline">/ piece</span>
                             </p>
-                            <div class="quantity-control-container w-28">
+                            <div class="quantity-control-container">
                                  ${quantityControlsHTML}
                             </div>
                         </div>

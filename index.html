@@ -323,21 +323,23 @@
             
             console.log("DEBUG: Headers found in CSV ->", headers);
 
-            const brandIndex = headers.indexOf('Brand');
-            const nameIndex = headers.indexOf('Name');
-            const priceIndex = headers.indexOf('Price');
-            const codeIndex = headers.indexOf('ProductCode');
-            const imageIndex = headers.indexOf('ImageURL');
-            const idIndex = headers.indexOf('ID');
-            // **FIX**: Look for the new column name "Koli Ici Fiyat" and fall back to the old one.
-            const koliIciAdetIndex = headers.indexOf('Koli Ici Fiyat') > -1 ? headers.indexOf('Koli Ici Fiyat') : headers.indexOf('KOLİ İÇİ ADET');
-            const koliFiyatIndex = headers.indexOf('Koli Fiyat');
+            const lowerCaseHeaders = headers.map(h => h.toLowerCase());
+
+            const brandIndex = lowerCaseHeaders.indexOf('brand');
+            const nameIndex = lowerCaseHeaders.indexOf('name');
+            const priceIndex = lowerCaseHeaders.indexOf('price');
+            const codeIndex = lowerCaseHeaders.indexOf('productcode');
+            const imageIndex = lowerCaseHeaders.indexOf('imageurl');
+            const idIndex = lowerCaseHeaders.indexOf('id');
+            // **FIX**: Added 'pieces per case' to the search.
+            const koliIciAdetIndex = lowerCaseHeaders.findIndex(h => h.includes('koli ici fiyat') || h.includes('koli i̇çi̇ adet') || h.includes('pieces per case'));
+            const koliFiyatIndex = lowerCaseHeaders.indexOf('koli fiyat');
             
             console.log(`DEBUG: Index for 'Pieces per Case' column is ${koliIciAdetIndex}`);
             console.log(`DEBUG: Index for 'Koli Fiyat' is ${koliFiyatIndex}`);
 
             if (koliIciAdetIndex === -1) {
-                console.error("FATAL ERROR: Could not find 'Koli Ici Fiyat' or 'KOLİ İÇİ ADET' header.");
+                console.error("FATAL ERROR: Could not find a header for pieces per case. Looked for 'Koli Ici Fiyat', 'KOLİ İÇİ ADET', and 'Pieces Per Case'.");
             }
              if (koliFiyatIndex === -1) {
                 console.error("FATAL ERROR: Could not find 'Koli Fiyat' header.");

@@ -158,9 +158,24 @@
                         <span>Total:</span>
                         <span id="cart-total">0.00 TL</span>
                     </div>
-                    <div class="mb-4">
-                        <label for="company-name" class="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
-                        <input type="text" id="company-name" name="company-name" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your company name" required>
+                    <div class="space-y-4 mb-4">
+                        <div>
+                            <label for="company-name" class="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+                            <input type="text" id="company-name" name="company-name" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your company name" required>
+                        </div>
+                        <div>
+                             <label for="phone-number" class="block text-sm font-medium text-slate-700 mb-1">Phone Number *</label>
+                             <div class="flex">
+                                <select id="country-code" class="border-slate-300 rounded-l-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="+90" selected>+90 (TR)</option>
+                                    <option value="+1">+1 (US)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+49">+49 (DE)</option>
+                                    <option value="+971">+971 (AE)</option>
+                                </select>
+                                <input type="tel" id="phone-number" name="phone-number" class="w-full border-slate-300 rounded-r-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="555 123 4567" required>
+                             </div>
+                        </div>
                     </div>
                     <div class="flex gap-2">
                          <button id="submit-order-btn" class="w-full btn-primary py-2 px-4 rounded-lg transition disabled:opacity-50" disabled>Submit & Export Order</button>
@@ -229,6 +244,8 @@
         const submitOrderBtn = document.getElementById('submit-order-btn');
         const toastEl = document.getElementById('toast');
         const companyNameInput = document.getElementById('company-name');
+        const countryCodeInput = document.getElementById('country-code');
+        const phoneNumberInput = document.getElementById('phone-number');
 
         let catalogData = {};
         let orderedBrands = [];
@@ -572,8 +589,9 @@
          */
         function updateSubmitButtonState() {
             const companyName = companyNameInput.value.trim();
+            const phoneNumber = phoneNumberInput.value.trim();
             const isCartEmpty = Object.keys(cart).length === 0;
-            const canSubmit = !isCartEmpty && companyName !== '';
+            const canSubmit = !isCartEmpty && companyName !== '' && phoneNumber !== '';
 
             submitOrderBtn.disabled = !canSubmit;
         }
@@ -659,6 +677,7 @@
          */
         function handleExportPdf() {
             const companyName = companyNameInput.value.trim();
+            const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -667,7 +686,8 @@
             doc.setFontSize(11);
             doc.setTextColor(100);
             doc.text(`Company: ${companyName}`, 14, 30);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 38);
+            doc.text(`Phone: ${fullPhoneNumber}`, 14, 38);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 46);
 
             const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
             const data = Object.values(cart).map(item => {
@@ -681,7 +701,7 @@
             });
 
             doc.autoTable({
-                startY: 50,
+                startY: 55,
                 head: headers,
                 body: data,
                 theme: 'striped',
@@ -704,8 +724,10 @@
          */
         function handleExportExcel() {
             const companyName = companyNameInput.value.trim();
+            const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
             const worksheetData = [
                 ["Company Name:", companyName],
+                ["Phone Number:", fullPhoneNumber],
                 [], // Spacer row
                 ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]
             ];
@@ -737,10 +759,14 @@
          */
         async function handleSubmitOrder() {
             const companyName = companyNameInput.value.trim();
-            if (!companyName) {
-                showToast("Please enter a company name.");
+            const phoneNumber = phoneNumberInput.value.trim();
+            
+            if (!companyName || !phoneNumber) {
+                showToast("Please fill in all required fields.");
                 return;
             }
+            
+            const fullPhoneNumber = countryCodeInput.value + phoneNumber;
             
             const total = Object.values(cart).reduce((sum, item) => {
                 const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
@@ -749,6 +775,7 @@
 
             const orderData = {
                 companyName: companyName,
+                phoneNumber: fullPhoneNumber,
                 cart: cart,
                 total: total,
                 currency: 'TL',
@@ -766,10 +793,11 @@
                 handleExportPdf();
                 handleExportExcel();
 
-                // Clear the cart
+                // Clear the cart and fields
                 cart = {};
                 await saveCartToFirestore();
                 companyNameInput.value = '';
+                phoneNumberInput.value = '';
 
             } catch (error) {
                 console.error("Error submitting order:", error);
@@ -831,6 +859,7 @@
         closeCartButton.addEventListener('click', toggleCart);
         submitOrderBtn.addEventListener('click', handleSubmitOrder);
         companyNameInput.addEventListener('input', updateSubmitButtonState);
+        phoneNumberInput.addEventListener('input', updateSubmitButtonState);
         document.addEventListener('DOMContentLoaded', initCatalogApp);
 
     </script>

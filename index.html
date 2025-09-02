@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Price Catalog</title>
+    <title>Digital Price Catalog (TL)</title>
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -74,6 +74,13 @@
         }
         .cart-hidden {
             transform: translateX(100%);
+        }
+
+        /* Scroll to top button visibility */
+        #scroll-to-top-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -185,6 +192,13 @@
         </div>
     </main>
 
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top-btn" class="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full btn-primary shadow-lg flex items-center justify-center transition-all duration-300 opacity-0 transform translate-y-4 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
     <!-- Footer Section -->
     <footer class="text-center py-6 mt-12 bg-white border-t border-slate-200">
         <p class="text-slate-500 text-sm">&copy; 2025 Çomoğlu Gıda Price Catalog. All rights reserved.</p>
@@ -206,29 +220,7 @@
         const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTemIQAjyMsEqPPUYaNMIn2rwrEbuqR7NrW9vey_mC1iZmIn7FZlOH7g3Co7bZG5B18BJy7Cjldvs53/pub?output=csv';
 
         const brandLogoMap = {
-            "BEŞLER": "https://res.cloudinary.com/dnc3itu1c/image/upload/l1.jpg",
-            "MASSIMO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l2.jpg",
-            "EDAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l3.jpg",
-            "BENORGANIC": "https://res.cloudinary.com/dnc3itu1c/image/upload/l4.jpg",
-            "UĞURLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l5.jpg",
-            "ÜNALPEYNIR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l6.jpg",
-            "ŞİFALIKÖY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l7.jpg",
-            "HOSANLI": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239661/l8.jpg",
-            "ORDU TARIM": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239712/l9.jpg",
-            "HAŞİROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l10.jpg",
-            "TADA": "https://res.cloudinary.com/dnc3itu1c/image/upload/l11.jpg",
-            "TAT": "https://res.cloudinary.com/dnc3itu1c/image/upload/l12.jpg",
-            "TEK LEZET": "https://res.cloudinary.com/dnc3itu1c/image/upload/l13.jpg",
-            "TAHSİLDAROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l14.jpg",
-            "ERİŞ UN": "https://res.cloudinary.com/dnc3itu1c/image/upload/l15.jpg",
-            "SOSERO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l16.jpg",
-            "YÖRE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l17.jpg",
-            "JUNGLE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l18.jpg",
-            "SMILE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l19.jpg",
-            "AYTAÇ": "https://res.cloudinary.com/dnc3itu1c/image/upload/l20.jpg",
-            "OFÇAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l21.jpg",
-            "EFOR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l22.jpg",
-            "GÜNDOĞDU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l23.jpg"
+            "BEŞLER": "https://res.cloudinary.com/dnc3itu1c/image/upload/l1.jpg", "MASSIMO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l2.jpg", "EDAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l3.jpg", "BENORGANIC": "https://res.cloudinary.com/dnc3itu1c/image/upload/l4.jpg", "UĞURLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l5.jpg", "ÜNALPEYNIR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l6.jpg", "ŞİFALIKÖY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l7.jpg", "HOSANLI": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239661/l8.jpg", "ORDU TARIM": "https://res.cloudinary.com/dnc3itu1c/image/upload/v1755239712/l9.jpg", "HAŞİROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l10.jpg", "TADA": "https://res.cloudinary.com/dnc3itu1c/image/upload/l11.jpg", "TAT": "https://res.cloudinary.com/dnc3itu1c/image/upload/l12.jpg", "TEK LEZET": "https://res.cloudinary.com/dnc3itu1c/image/upload/l13.jpg", "TAHSİLDAROĞLU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l14.jpg", "ERİŞ UN": "https://res.cloudinary.com/dnc3itu1c/image/upload/l15.jpg", "SOSERO": "https://res.cloudinary.com/dnc3itu1c/image/upload/l16.jpg", "YÖRE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l17.jpg", "JUNGLE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l18.jpg", "SMILE": "https://res.cloudinary.com/dnc3itu1c/image/upload/l19.jpg", "AYTAÇ": "https://res.cloudinary.com/dnc3itu1c/image/upload/l20.jpg", "OFÇAY": "https://res.cloudinary.com/dnc3itu1c/image/upload/l21.jpg", "EFOR": "https://res.cloudinary.com/dnc3itu1c/image/upload/l22.jpg", "GÜNDOĞDU": "https://res.cloudinary.com/dnc3itu1c/image/upload/l23.jpg"
         };
 
         // --- DOM Elements ---
@@ -246,6 +238,7 @@
         const companyNameInput = document.getElementById('company-name');
         const countryCodeInput = document.getElementById('country-code');
         const phoneNumberInput = document.getElementById('phone-number');
+        const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
 
         let catalogData = {};
         let orderedBrands = [];
@@ -259,16 +252,9 @@
 
         // Hardcoded Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyDjl2QFyRWoN_SjbRKTuhxp9ksgm-5MBTw",
-            authDomain: "comogluimg.firebaseapp.com",
-            projectId: "comogluimg",
-            storageBucket: "comogluimg.appspot.com",
-            messagingSenderId: "964383861519",
-            appId: "1:964383861519:web:447d607e3c158df951ec7a",
-            measurementId: "G-NK80JQBKXE"
+            apiKey: "AIzaSyDjl2QFyRWoN_SjbRKTuhxp9ksgm-5MBTw", authDomain: "comogluimg.firebaseapp.com", projectId: "comogluimg", storageBucket: "comogluimg.appspot.com", messagingSenderId: "964383861519", appId: "1:964383861519:web:447d607e3c158df951ec7a", measurementId: "G-NK80JQBKXE"
         };
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'digital-price-catalog';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'digital-price-catalog-tl';
 
 
         /**
@@ -276,38 +262,26 @@
          */
         async function initializeFirebase() {
             if (!firebaseConfig.apiKey) {
-                console.error("Firebase config is not available. Please update it with your actual Firebase project credentials.");
-                return;
+                console.error("Firebase config is not available."); return;
             }
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 setLogLevel('debug');
-
-                // onAuthStateChanged is the recommended way to manage user sessions.
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        // User is signed in.
                         console.log("User is signed in:", user.uid);
                         userId = user.uid;
                         const cartPath = `/artifacts/${appId}/users/${userId}/cart/data`;
                         cartDocRef = doc(db, cartPath);
                         listenToCartChanges();
                     } else {
-                        // User is not signed in. Attempt to sign in anonymously.
                         console.log("No user found, attempting anonymous sign-in...");
-                        try {
-                            await signInAnonymously(auth);
-                        } catch (signInError) {
-                            console.error("Firebase anonymous sign-in failed:", signInError);
-                        }
+                        try { await signInAnonymously(auth); } catch (e) { console.error("Firebase anonymous sign-in failed:", e); }
                     }
                 });
-
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-            }
+            } catch (error) { console.error("Firebase initialization failed:", error); }
         }
         
         /**
@@ -316,17 +290,11 @@
         function listenToCartChanges() {
             if (unsubscribeCart) unsubscribeCart();
             if (!cartDocRef) return;
-
             unsubscribeCart = onSnapshot(cartDocRef, (doc) => {
                 cart = doc.exists() ? doc.data().items || {} : {};
                 renderCart();
-                // Refresh the product grid if a brand is currently displayed
-                if (currentBrand) {
-                    displayProducts(currentBrand);
-                }
-            }, (error) => {
-                console.error("Error listening to cart changes:", error);
-            });
+                if (currentBrand) { displayProducts(currentBrand, false); } // Don't scroll on background refresh
+            }, (error) => { console.error("Error listening to cart changes:", error); });
         }
 
         /**
@@ -334,11 +302,7 @@
          */
         async function saveCartToFirestore() {
             if (!cartDocRef) return;
-            try {
-                await setDoc(cartDocRef, { items: cart });
-            } catch (error) {
-                console.error("Error saving cart to Firestore:", error);
-            }
+            try { await setDoc(cartDocRef, { items: cart }); } catch (error) { console.error("Error saving cart to Firestore:", error); }
         }
         
         /**
@@ -348,9 +312,7 @@
             const data = {};
             const seenBrands = new Set();
             const rows = csvText.trim().replace(/\r/g, '').split('\n').filter(row => row.trim() !== '');
-            
             const headers = rows[0].replace(/\uFEFF/g, '').split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            
             const lowerCaseHeaders = headers.map(h => h.toLowerCase());
 
             const brandIndex = lowerCaseHeaders.indexOf('brand');
@@ -365,27 +327,15 @@
             for (let i = 1; i < rows.length; i++) {
                 const rowText = rows[i].trim();
                 if (!rowText.includes(',')) continue;
-                
                 const values = rowText.split(',').map(v => v.trim());
                 const brand = values[brandIndex] ? values[brandIndex].trim() : null;
 
-                if (!brand || brand.toLowerCase() === 'brand' || brand === 'Koli Fiyat') {
-                    continue;
-                }
-
-                if (!data[brand]) {
-                    data[brand] = [];
-                }
-                
-                if (!seenBrands.has(brand)) {
-                    orderedBrands.push(brand);
-                    seenBrands.add(brand);
-                }
+                if (!brand || brand.toLowerCase() === 'brand' || brand === 'Koli Fiyat') continue;
+                if (!data[brand]) data[brand] = [];
+                if (!seenBrands.has(brand)) { orderedBrands.push(brand); seenBrands.add(brand); }
 
                 let imageUrl = values[imageIndex] || null;
-                if (imageUrl && imageUrl.startsWith('https//')) {
-                    imageUrl = 'https://' + imageUrl.substring(8);
-                }
+                if (imageUrl && imageUrl.startsWith('https//')) imageUrl = 'https://' + imageUrl.substring(8);
                 
                 const productData = {
                     id: values[idIndex] || `prod-${Date.now()}-${i}`,
@@ -396,7 +346,6 @@
                     koliIciAdet: parseInt(values[koliIciAdetIndex], 10) || 0,
                     koliFiyat: parseFloat(values[koliFiyatIndex]) || 0
                 };
-                
                 data[brand].push(productData);
             }
             return data;
@@ -404,32 +353,31 @@
         
         /**
          * Renders the product grid for a selected brand.
+         * @param {string} brand - The brand name to display.
+         * @param {boolean} shouldScroll - Whether to scroll to the top of the section.
          */
-        function displayProducts(brand) {
-            currentBrand = brand; // Set the current brand
+        function displayProducts(brand, shouldScroll = true) {
+            currentBrand = brand;
             if (!catalogData[brand] || catalogData[brand].length === 0) {
                 console.warn(`Brand "${brand}" not found or has no products.`);
-                productGrid.innerHTML = `<p class="text-center col-span-full">No products found for this brand.</p>`;
-                return;
+                productGrid.innerHTML = `<p class="text-center col-span-full">No products found for this brand.</p>`; return;
             }
             
             const brandLogoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo";
-
             brandTitleContainer.innerHTML = `
                 <span class="w-3 h-10 brand-title-accent rounded-full"></span>
                 <img src="${brandLogoUrl}" alt="${brand} Logo" class="h-10 w-auto object-contain">
-                <h2 class="text-3xl font-bold text-slate-800">${brand}</h2>
-            `;
+                <h2 class="text-3xl font-bold text-slate-800">${brand}</h2>`;
+            
+            // NEW: Scroll to the brand navigation bar when a new brand is clicked
+            if (shouldScroll) {
+                brandNavContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
             
             productGrid.innerHTML = '';
-
             document.querySelectorAll('#brand-nav-buttons button').forEach(button => {
                 const isActive = button.dataset.brand === brand;
-                button.className = `px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 ${
-                    isActive
-                        ? 'brand-button-active shadow-lg'
-                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`;
+                button.className = `px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 ${isActive ? 'brand-button-active shadow-lg' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`;
             });
 
             const products = catalogData[brand] || [];
@@ -437,420 +385,181 @@
                 const card = document.createElement('div');
                 card.className = "product-card-animate bg-white rounded-2xl shadow-lg overflow-hidden group transition-shadow duration-300 hover:shadow-xl flex flex-col";
                 card.style.animationDelay = `${index * 50}ms`;
-
                 const placeholderUrl = `https://placehold.co/400x400/EEE/31343C?text=${encodeURIComponent(product.name.split(' ')[0])}`;
                 const imageUrl = product.imageUrl || placeholderUrl;
                 const quantity = cart[product.id]?.quantity || 0;
 
-                let quantityControlsHTML;
-                if (quantity === 0) {
-                    quantityControlsHTML = `<button data-product-id="${product.id}" class="add-to-cart-btn btn-primary w-full rounded-lg px-4 py-2 font-semibold transition-all">Add to Cart</button>`;
-                } else {
-                    quantityControlsHTML = `
-                        <div class="flex items-center justify-center gap-2">
-                            <button data-product-id="${product.id}" class="decrement-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">-</button>
-                            <span class="font-bold text-lg w-10 text-center">${quantity}</span>
-                            <button data-product-id="${product.id}" class="increment-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">+</button>
-                        </div>
-                    `;
-                }
-
-                let pricingAndControlsHTML;
-                if (product.koliFiyat > 0) {
-                    // Layout WITH Koli Fiyat
-                    pricingAndControlsHTML = `
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL</p>
-                                    <p class="text-sm text-slate-500">/ piece</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xl font-extrabold price-accent-color">${product.koliFiyat.toFixed(2)} TL</p>
-                                    <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet > 0 ? product.koliIciAdet + ' pcs' : ''})</p>
-                                </div>
-                            </div>
-                            <div class="quantity-control-container">
-                                ${quantityControlsHTML}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Layout WITHOUT Koli Fiyat
-                    pricingAndControlsHTML = `
-                        <div class="space-y-4">
-                             <p class="text-xl font-extrabold text-slate-900">
-                                ${product.price.toFixed(2)} TL 
-                                <span class="text-sm text-slate-500 font-medium align-baseline">/ piece</span>
-                            </p>
-                            <div class="quantity-control-container">
-                                 ${quantityControlsHTML}
-                            </div>
-                        </div>
-                    `;
-                }
-
+                let quantityControlsHTML = quantity === 0
+                    ? `<button data-product-id="${product.id}" class="add-to-cart-btn btn-primary w-full rounded-lg px-4 py-2 font-semibold transition-all">Add to Cart</button>`
+                    : `<div class="flex items-center justify-center gap-2">
+                           <button data-product-id="${product.id}" class="decrement-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">-</button>
+                           <span class="font-bold text-lg w-10 text-center">${quantity}</span>
+                           <button data-product-id="${product.id}" class="increment-btn bg-slate-200 text-slate-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-300">+</button>
+                       </div>`;
+                
+                let pricingAndControlsHTML = product.koliFiyat > 0
+                    ? `<div class="space-y-4">
+                           <div class="flex justify-between items-center">
+                               <div>
+                                   <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL</p>
+                                   <p class="text-sm text-slate-500">/ piece</p>
+                               </div>
+                               <div class="text-right">
+                                   <p class="text-xl font-extrabold price-accent-color">${product.koliFiyat.toFixed(2)} TL</p>
+                                   <p class="text-sm text-slate-500">/ Koli Fiyat (${product.koliIciAdet > 0 ? product.koliIciAdet + ' pcs' : ''})</p>
+                               </div>
+                           </div>
+                           <div class="quantity-control-container">${quantityControlsHTML}</div>
+                       </div>`
+                    : `<div class="space-y-4">
+                           <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL <span class="text-sm text-slate-500 font-medium align-baseline">/ piece</span></p>
+                           <div class="quantity-control-container">${quantityControlsHTML}</div>
+                       </div>`;
 
                 card.innerHTML = `
                     <div class="relative h-56">
-                        <img 
-                            src="${imageUrl}" 
-                            alt="${product.name}" 
-                            class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110"
-                            loading="lazy"
-                            onError="this.onerror=null; this.src='${placeholderUrl}';"
-                        />
+                        <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110" loading="lazy" onError="this.onerror=null; this.src='${placeholderUrl}';"/>
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex-grow">
-                            <h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3>
-                        </div>
-                        
-                        <div class="mt-4 pt-4 border-t">
-                           ${pricingAndControlsHTML}
-                        </div>
-                    </div>
-                `;
+                        <div class="flex-grow"><h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3></div>
+                        <div class="mt-4 pt-4 border-t">${pricingAndControlsHTML}</div>
+                    </div>`;
                 productGrid.appendChild(card);
             });
-
-            // Add event listeners to the new buttons
             productGrid.querySelectorAll('.add-to-cart-btn, .increment-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const product = findProductById(btn.dataset.productId);
-                    if (product) addToCart(product);
-                };
+                btn.onclick = () => { const p = findProductById(btn.dataset.productId); if (p) addToCart(p); };
             });
             productGrid.querySelectorAll('.decrement-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const product = findProductById(btn.dataset.productId);
-                    if (product) decrementFromCart(product);
-                };
+                btn.onclick = () => { const p = findProductById(btn.dataset.productId); if (p) decrementFromCart(p); };
             });
         }
         
-        /**
-         * Finds a product in the catalogData by its ID.
-         */
         function findProductById(productId) {
-            for (const brand in catalogData) {
-                const product = catalogData[brand].find(p => p.id === productId);
-                if (product) return product;
-            }
-            return null;
+            for (const b in catalogData) { const p = catalogData[b].find(p => p.id === productId); if (p) return p; } return null;
         }
-
-        /**
-         * Adds a product to the cart or increments its quantity.
-         * Stores both piece price and koli fiyat to be used later.
-         */
         function addToCart(product) {
             const { id, name, price, koliFiyat } = product;
-            if (cart[id]) {
-                cart[id].quantity++;
-            } else {
-                cart[id] = { name, price, koliFiyat, quantity: 1 };
-                showToast("Item added to cart!");
-            }
+            if (cart[id]) { cart[id].quantity++; } else { cart[id] = { name, price, koliFiyat, quantity: 1 }; showToast("Item added to cart!"); }
             saveCartToFirestore();
         }
-        
-        /**
-         * Decrements a product's quantity or removes it from the cart.
-         */
         function decrementFromCart(product) {
             const { id } = product;
-            if (cart[id]) {
-                if (cart[id].quantity > 1) {
-                    cart[id].quantity--;
-                } else {
-                    delete cart[id];
-                }
-                saveCartToFirestore();
-            }
+            if (cart[id]) { if (cart[id].quantity > 1) { cart[id].quantity--; } else { delete cart[id]; } saveCartToFirestore(); }
         }
-
-        /**
-         * Updates item quantity in the cart from the cart sidebar.
-         */
         function updateCartQuantity(productId, newQuantity) {
-            if (cart[productId]) {
-                if (newQuantity > 0) {
-                    cart[productId].quantity = newQuantity;
-                } else {
-                    delete cart[productId];
-                }
-                saveCartToFirestore();
-            }
+            if (cart[productId]) { if (newQuantity > 0) { cart[productId].quantity = newQuantity; } else { delete cart[productId]; } saveCartToFirestore(); }
         }
-
-        /**
-         * Checks if export buttons should be enabled or disabled.
-         */
         function updateSubmitButtonState() {
             const companyName = companyNameInput.value.trim();
             const phoneNumber = phoneNumberInput.value.trim();
             const isCartEmpty = Object.keys(cart).length === 0;
-            const canSubmit = !isCartEmpty && companyName !== '' && phoneNumber !== '';
-
-            submitOrderBtn.disabled = !canSubmit;
+            submitOrderBtn.disabled = !(!isCartEmpty && companyName !== '' && phoneNumber !== '');
         }
-
-        /**
-         * Renders the cart UI based on the local cart state.
-         */
         function renderCart() {
-            if (Object.keys(cart).length === 0) {
-                cartItemsContainer.innerHTML = `<p class="text-slate-500 text-center mt-8">Your cart is empty.</p>`;
-            } else {
-                cartItemsContainer.innerHTML = '';
-                Object.entries(cart).forEach(([id, item]) => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'flex justify-between items-center mb-4';
-
+            cartItemsContainer.innerHTML = Object.keys(cart).length === 0
+                ? `<p class="text-slate-500 text-center mt-8">Your cart is empty.</p>`
+                : Object.entries(cart).map(([id, item]) => {
                     const priceToShow = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                    
-                    itemEl.innerHTML = `
-                        <div class="flex-grow">
-                            <p class="font-semibold">${item.name}</p>
-                            <p class="text-sm text-slate-500">${priceToShow.toFixed(2)} TL</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="number" min="1" value="${item.quantity}" data-id="${id}" class="quantity-input w-16 border rounded-md p-1 text-center">
-                            <button data-id="${id}" class="remove-item-btn text-red-500 hover:text-red-700 text-2xl">&times;</button>
-                        </div>
-                    `;
-                    cartItemsContainer.appendChild(itemEl);
-                });
-            }
-
-            // Add event listeners for quantity changes and removal
-            cartItemsContainer.querySelectorAll('.quantity-input').forEach(input => {
-                input.onchange = (e) => {
-                    const newQuantity = parseInt(e.target.value, 10);
-                    updateCartQuantity(e.target.dataset.id, newQuantity);
-                };
-            });
-            cartItemsContainer.querySelectorAll('.remove-item-btn').forEach(btn => {
-                btn.onclick = (e) => updateCartQuantity(e.target.dataset.id, 0);
-            });
-
+                    return `<div class="flex justify-between items-center mb-4">
+                                <div class="flex-grow">
+                                    <p class="font-semibold">${item.name}</p>
+                                    <p class="text-sm text-slate-500">${priceToShow.toFixed(2)} TL</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" min="1" value="${item.quantity}" data-id="${id}" class="quantity-input w-16 border rounded-md p-1 text-center">
+                                    <button data-id="${id}" class="remove-item-btn text-red-500 hover:text-red-700 text-2xl">&times;</button>
+                                </div>
+                            </div>`;
+                }).join('');
+            
+            cartItemsContainer.querySelectorAll('.quantity-input').forEach(i => { i.onchange = (e) => updateCartQuantity(e.target.dataset.id, parseInt(e.target.value, 10)); });
+            cartItemsContainer.querySelectorAll('.remove-item-btn').forEach(b => { b.onclick = (e) => updateCartQuantity(e.target.dataset.id, 0); });
             updateCartSummary();
             updateSubmitButtonState();
         }
-
-        /**
-         * Updates the cart total and item count bubble.
-         */
         function updateCartSummary() {
-            const total = Object.values(cart).reduce((sum, item) => {
-                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                return sum + (priceToUse * item.quantity);
-            }, 0);
-            const itemCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
-            
+            const total = Object.values(cart).reduce((s, item) => s + ((item.koliFiyat && item.koliFiyat > 0 ? item.koliFiyat : item.price) * item.quantity), 0);
+            const itemCount = Object.values(cart).reduce((s, item) => s + item.quantity, 0);
             cartTotalEl.textContent = `${total.toFixed(2)} TL`;
             cartItemCountEl.textContent = itemCount;
             cartItemCountEl.classList.toggle('hidden', itemCount === 0);
         }
-
-        /**
-         * Shows a short-lived toast notification.
-         */
         function showToast(message) {
             toastEl.textContent = message;
             toastEl.classList.remove('opacity-0', 'translate-y-3');
-            setTimeout(() => {
-                toastEl.classList.add('opacity-0', 'translate-y-3');
-            }, 2000);
+            setTimeout(() => { toastEl.classList.add('opacity-0', 'translate-y-3'); }, 2000);
         }
-        
-        /**
-         * Toggles the visibility of the cart sidebar.
-         */
-        function toggleCart() {
-            cartContainer.classList.toggle('cart-hidden');
-        }
-
-        /**
-         * Exports the cart to a PDF file.
-         */
+        function toggleCart() { cartContainer.classList.toggle('cart-hidden'); }
         function handleExportPdf() {
             const companyName = companyNameInput.value.trim();
             const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(18);
-            doc.text("Order Summary", 14, 22);
-            doc.setFontSize(11);
-            doc.setTextColor(100);
-            doc.text(`Company: ${companyName}`, 14, 30);
-            doc.text(`Phone: ${fullPhoneNumber}`, 14, 38);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 46);
-
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFontSize(18); doc.text("Order Summary", 14, 22);
+            doc.setFontSize(11); doc.setTextColor(100);
+            doc.text(`Company: ${companyName}`, 14, 30); doc.text(`Phone: ${fullPhoneNumber}`, 14, 38); doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 46);
             const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
-            const data = Object.values(cart).map(item => {
-                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                return [
-                    item.name,
-                    item.quantity,
-                    priceToUse.toFixed(2),
-                    (priceToUse * item.quantity).toFixed(2)
-                ]
-            });
-
-            doc.autoTable({
-                startY: 55,
-                head: headers,
-                body: data,
-                theme: 'striped',
-                headStyles: { fillColor: [41, 128, 185] }
-            });
-
+            const data = Object.values(cart).map(item => { const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; return [ item.name, item.quantity, p.toFixed(2), (p * item.quantity).toFixed(2) ] });
+            doc.autoTable({ startY: 55, head: headers, body: data, theme: 'striped', headStyles: { fillColor: [41, 128, 185] } });
             const finalY = doc.autoTable.previous.finalY;
-            const total = Object.values(cart).reduce((sum, item) => {
-                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                return sum + (priceToUse * item.quantity);
-            }, 0);
-            doc.setFontSize(14);
-            doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
-
+            const total = Object.values(cart).reduce((s, i) => s + ((i.koliFiyat && i.koliFiyat > 0 ? i.koliFiyat : i.price) * i.quantity), 0);
+            doc.setFontSize(14); doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
             doc.save(`order_${companyName.replace(/\s+/g, '_')}.pdf`);
         }
-
-        /**
-         * Exports the cart to an Excel (XLSX) file.
-         */
         function handleExportExcel() {
             const companyName = companyNameInput.value.trim();
             const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
-            const worksheetData = [
-                ["Company Name:", companyName],
-                ["Phone Number:", fullPhoneNumber],
-                [], // Spacer row
-                ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]
-            ];
-            
+            const worksheetData = [ ["Company Name:", companyName], ["Phone Number:", fullPhoneNumber], [], ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"] ];
             let total = 0;
-            Object.values(cart).forEach(item => {
-                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                const itemTotal = priceToUse * item.quantity;
-                total += itemTotal;
-                worksheetData.push([
-                    item.name,
-                    item.quantity,
-                    priceToUse,
-                    itemTotal
-                ]);
-            });
-            
-            worksheetData.push([]); // Spacer row
-            worksheetData.push(["", "", "Grand Total:", total]);
-
+            Object.values(cart).forEach(item => { const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; const iTotal = p * item.quantity; total += iTotal; worksheetData.push([ item.name, item.quantity, p, iTotal ]); });
+            worksheetData.push([], ["", "", "Grand Total:", total]);
             const ws = XLSX.utils.aoa_to_sheet(worksheetData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Cart");
             XLSX.writeFile(wb, `order_${companyName.replace(/\s+/g, '_')}.xlsx`);
         }
-
-        /**
-         * Handles the entire order submission process.
-         */
         async function handleSubmitOrder() {
             const companyName = companyNameInput.value.trim();
             const phoneNumber = phoneNumberInput.value.trim();
-            
-            if (!companyName || !phoneNumber) {
-                showToast("Please fill in all required fields.");
-                return;
-            }
-            
+            if (!companyName || !phoneNumber) { showToast("Please fill in all required fields."); return; }
             const fullPhoneNumber = countryCodeInput.value + phoneNumber;
-            
-            const total = Object.values(cart).reduce((sum, item) => {
-                const priceToUse = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
-                return sum + (priceToUse * item.quantity);
-            }, 0);
-
-            const orderData = {
-                companyName: companyName,
-                phoneNumber: fullPhoneNumber,
-                cart: cart,
-                total: total,
-                currency: 'TL',
-                userId: userId,
-                createdAt: serverTimestamp()
-            };
-
+            const total = Object.values(cart).reduce((s, i) => s + ((i.koliFiyat && i.koliFiyat > 0 ? i.koliFiyat : i.price) * i.quantity), 0);
+            const orderData = { companyName, phoneNumber: fullPhoneNumber, cart, total, currency: 'TL', userId, createdAt: serverTimestamp() };
             try {
                 const ordersCollectionRef = collection(db, `/artifacts/${appId}/public/data/orders`);
                 await addDoc(ordersCollectionRef, orderData);
-                
                 showToast("Order submitted successfully!");
-                
-                // Trigger exports
-                handleExportPdf();
-                handleExportExcel();
-
-                // Clear the cart and fields
-                cart = {};
-                await saveCartToFirestore();
-                companyNameInput.value = '';
-                phoneNumberInput.value = '';
-
-            } catch (error) {
-                console.error("Error submitting order:", error);
-                showToast("Failed to submit order.");
-            }
+                handleExportPdf(); handleExportExcel();
+                cart = {}; await saveCartToFirestore();
+                companyNameInput.value = ''; phoneNumberInput.value = '';
+            } catch (error) { console.error("Error submitting order:", error); showToast("Failed to submit order."); }
         }
-
-
-        /**
-         * Initializes the application.
-         */
         async function initCatalogApp() {
             await initializeFirebase();
             try {
                 const response = await fetch(googleSheetCsvUrl);
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok (status: ${response.status}). Check if the sheet is published correctly.`);
-                }
+                if (!response.ok) throw new Error(`Network response was not ok (status: ${response.status}).`);
                 const csvText = await response.text();
                 catalogData = parseCsvData(csvText);
-                
                 brandNavContainer.innerHTML = '';
                 if (orderedBrands.length > 0) {
                     orderedBrands.forEach(brand => {
                         const button = document.createElement('button');
                         button.dataset.brand = brand;
                         button.className = 'px-3 py-2 text-sm font-semibold rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center gap-2';
-                        
                         const logoUrl = brandLogoMap[brand] || "https://placehold.co/100x100/FFFFFF/CCCCCC?text=Logo";
-
-                        button.innerHTML = `
-                            <img src="${logoUrl}" alt="${brand} Logo" class="h-6 w-6 object-contain rounded-full bg-white p-0.5">
-                            <span>${brand}</span>
-                        `;
-
-                        button.onclick = () => {
-                            displayProducts(brand);
-                        };
+                        button.innerHTML = `<img src="${logoUrl}" alt="${brand} Logo" class="h-6 w-6 object-contain rounded-full bg-white p-0.5"> <span>${brand}</span>`;
+                        button.onclick = () => displayProducts(brand);
                         brandNavContainer.appendChild(button);
                     });
-                    displayProducts(orderedBrands[0]);
+                    displayProducts(orderedBrands[0], false); // Don't scroll on initial load
                 } else {
                     brandTitleContainer.innerHTML = `<h2 class="text-3xl font-bold text-slate-800">No products found.</h2>`;
-                    productGrid.innerHTML = `<p class="text-center col-span-full text-slate-500">The catalog is currently empty. Please add products to the Google Sheet.</p>`;
+                    productGrid.innerHTML = `<p class="text-center col-span-full text-slate-500">The catalog is empty.</p>`;
                 }
-
             } catch (error) {
                 console.error('Failed to initialize app:', error);
                 brandTitleContainer.innerHTML = `<h2 class="text-3xl font-bold text-red-600">Error Loading Products</h2>`;
-                productGrid.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 col-span-full rounded-r-lg" role="alert">
-                                                 <p class="font-bold">Failed to load data</p>
-                                                 <p>${error.message}</p>
-                                               </div>`;
+                productGrid.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert"><p>${error.message}</p></div>`;
             }
         }
         
@@ -860,8 +569,22 @@
         submitOrderBtn.addEventListener('click', handleSubmitOrder);
         companyNameInput.addEventListener('input', updateSubmitButtonState);
         phoneNumberInput.addEventListener('input', updateSubmitButtonState);
+        
+        // --- Scroll to Top Logic ---
+        window.onscroll = () => {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        };
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
         document.addEventListener('DOMContentLoaded', initCatalogApp);
 
     </script>
 </body>
 </html>
+

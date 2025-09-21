@@ -317,6 +317,7 @@
 
             const brandIndex = lowerCaseHeaders.indexOf('brand');
             const nameIndex = lowerCaseHeaders.indexOf('name');
+            const englishNameIndex = lowerCaseHeaders.indexOf('english'); // <-- ADDED
             const priceIndex = lowerCaseHeaders.indexOf('price');
             const codeIndex = lowerCaseHeaders.indexOf('productcode');
             const imageIndex = lowerCaseHeaders.indexOf('imageurl');
@@ -341,6 +342,7 @@
                     id: values[idIndex] || `prod-${Date.now()}-${i}`,
                     productCode: values[codeIndex] || 'N/A',
                     name: values[nameIndex] || 'Unnamed Product',
+                    englishName: values[englishNameIndex] || null, // <-- ADDED
                     price: parseFloat(values[priceIndex]) || 0,
                     imageUrl: imageUrl,
                     koliIciAdet: parseInt(values[koliIciAdetIndex], 10) || 0,
@@ -369,7 +371,6 @@
                 <img src="${brandLogoUrl}" alt="${brand} Logo" class="h-10 w-auto object-contain">
                 <h2 class="text-3xl font-bold text-slate-800">${brand}</h2>`;
             
-            // NEW: Scroll to the brand navigation bar when a new brand is clicked
             if (shouldScroll) {
                 brandNavContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
@@ -415,15 +416,20 @@
                            <p class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)} TL <span class="text-sm text-slate-500 font-medium align-baseline">/ piece</span></p>
                            <div class="quantity-control-container">${quantityControlsHTML}</div>
                        </div>`;
-
+                
+                // <-- MODIFICATION START -->
                 card.innerHTML = `
                     <div class="relative h-56">
                         <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-110" loading="lazy" onError="this.onerror=null; this.src='${placeholderUrl}';"/>
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex-grow"><h3 class="text-lg font-bold text-slate-800 mb-2">${product.name}</h3></div>
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">${product.name}</h3>
+                            ${product.englishName ? `<p class="text-sm text-slate-500 mb-2">${product.englishName}</p>` : ''}
+                        </div>
                         <div class="mt-4 pt-4 border-t">${pricingAndControlsHTML}</div>
                     </div>`;
+                // <-- MODIFICATION END -->
                 productGrid.appendChild(card);
             });
             productGrid.querySelectorAll('.add-to-cart-btn, .increment-btn').forEach(btn => {
@@ -437,11 +443,18 @@
         function findProductById(productId) {
             for (const b in catalogData) { const p = catalogData[b].find(p => p.id === productId); if (p) return p; } return null;
         }
+
         function addToCart(product) {
-            const { id, name, price, koliFiyat } = product;
-            if (cart[id]) { cart[id].quantity++; } else { cart[id] = { name, price, koliFiyat, quantity: 1 }; showToast("Item added to cart!"); }
+            const { id, name, englishName, price, koliFiyat } = product; // <-- MODIFIED
+            if (cart[id]) { 
+                cart[id].quantity++; 
+            } else { 
+                cart[id] = { name, englishName, price, koliFiyat, quantity: 1 }; // <-- MODIFIED
+                showToast("Item added to cart!"); 
+            }
             saveCartToFirestore();
         }
+
         function decrementFromCart(product) {
             const { id } = product;
             if (cart[id]) { if (cart[id].quantity > 1) { cart[id].quantity--; } else { delete cart[id]; } saveCartToFirestore(); }
@@ -460,16 +473,19 @@
                 ? `<p class="text-slate-500 text-center mt-8">Your cart is empty.</p>`
                 : Object.entries(cart).map(([id, item]) => {
                     const priceToShow = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price;
+                    // <-- MODIFICATION START -->
                     return `<div class="flex justify-between items-center mb-4">
                                 <div class="flex-grow">
                                     <p class="font-semibold">${item.name}</p>
-                                    <p class="text-sm text-slate-500">${priceToShow.toFixed(2)} TL</p>
+                                    ${item.englishName ? `<p class="text-xs text-slate-500">${item.englishName}</p>` : ''}
+                                    <p class="text-sm text-slate-500 mt-1">${priceToShow.toFixed(2)} TL</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="number" min="1" value="${item.quantity}" data-id="${id}" class="quantity-input w-16 border rounded-md p-1 text-center">
                                     <button data-id="${id}" class="remove-item-btn text-red-500 hover:text-red-700 text-2xl">&times;</button>
                                 </div>
                             </div>`;
+                    // <-- MODIFICATION END -->
                 }).join('');
             
             cartItemsContainer.querySelectorAll('.quantity-input').forEach(i => { i.onchange = (e) => updateCartQuantity(e.target.dataset.id, parseInt(e.target.value, 10)); });
@@ -490,6 +506,7 @@
             setTimeout(() => { toastEl.classList.add('opacity-0', 'translate-y-3'); }, 2000);
         }
         function toggleCart() { cartContainer.classList.toggle('cart-hidden'); }
+        
         function handleExportPdf() {
             const companyName = companyNameInput.value.trim();
             const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
@@ -497,26 +514,38 @@
             doc.setFontSize(18); doc.text("Order Summary", 14, 22);
             doc.setFontSize(11); doc.setTextColor(100);
             doc.text(`Company: ${companyName}`, 14, 30); doc.text(`Phone: ${fullPhoneNumber}`, 14, 38); doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 46);
-            const headers = [["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
-            const data = Object.values(cart).map(item => { const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; return [ item.name, item.quantity, p.toFixed(2), (p * item.quantity).toFixed(2) ] });
+            // <-- MODIFIED -->
+            const headers = [["Product Name", "English Name", "Quantity", "Unit Price (TL)", "Total (TL)"]];
+            const data = Object.values(cart).map(item => { 
+                const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; 
+                return [ item.name, item.englishName || '', item.quantity, p.toFixed(2), (p * item.quantity).toFixed(2) ] 
+            });
             doc.autoTable({ startY: 55, head: headers, body: data, theme: 'striped', headStyles: { fillColor: [41, 128, 185] } });
             const finalY = doc.autoTable.previous.finalY;
             const total = Object.values(cart).reduce((s, i) => s + ((i.koliFiyat && i.koliFiyat > 0 ? i.koliFiyat : i.price) * i.quantity), 0);
             doc.setFontSize(14); doc.text(`Grand Total: ${total.toFixed(2)} TL`, 14, finalY + 15);
             doc.save(`order_${companyName.replace(/\s+/g, '_')}.pdf`);
         }
+
         function handleExportExcel() {
             const companyName = companyNameInput.value.trim();
             const fullPhoneNumber = countryCodeInput.value + phoneNumberInput.value.trim();
-            const worksheetData = [ ["Company Name:", companyName], ["Phone Number:", fullPhoneNumber], [], ["Product Name", "Quantity", "Unit Price (TL)", "Total (TL)"] ];
+            // <-- MODIFIED -->
+            const worksheetData = [ ["Company Name:", companyName], ["Phone Number:", fullPhoneNumber], [], ["Product Name", "English Name", "Quantity", "Unit Price (TL)", "Total (TL)"] ];
             let total = 0;
-            Object.values(cart).forEach(item => { const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; const iTotal = p * item.quantity; total += iTotal; worksheetData.push([ item.name, item.quantity, p, iTotal ]); });
-            worksheetData.push([], ["", "", "Grand Total:", total]);
+            Object.values(cart).forEach(item => { 
+                const p = (item.koliFiyat && item.koliFiyat > 0) ? item.koliFiyat : item.price; 
+                const iTotal = p * item.quantity; 
+                total += iTotal; 
+                worksheetData.push([ item.name, item.englishName || '', item.quantity, p, iTotal ]); 
+            });
+            worksheetData.push([], ["", "", "", "Grand Total:", total]);
             const ws = XLSX.utils.aoa_to_sheet(worksheetData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Cart");
             XLSX.writeFile(wb, `order_${companyName.replace(/\s+/g, '_')}.xlsx`);
         }
+
         async function handleSubmitOrder() {
             const companyName = companyNameInput.value.trim();
             const phoneNumber = phoneNumberInput.value.trim();
@@ -587,4 +616,3 @@
     </script>
 </body>
 </html>
-
